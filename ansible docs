@@ -1,0 +1,17 @@
+INSTALL ANSIBLE IN DEBIAN/UBUNTU
+sudo apt update
+sudo apt install software-properties-common
+sudo add-apt-repository --yes --update ppa:ansible/ansible
+sudo apt install ansible
+
+CLIENT/WORKER/SLAVE SETTINGS
+1. sudo nano /etc/ssh/sshd_config
+2. enable root login
+3. enable password login
+4. save and exit
+
+SERVER/MANAGER/MASTER SETTINGS
+1. ssh-keygen
+2. ssh-copy-id root@172.31.38.175
+3. enter root/user password 
+4. passwordless auth established
