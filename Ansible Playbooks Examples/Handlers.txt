@@ -1,0 +1,43 @@
+Handlers
+
+Any software package will have configuration files and any changes to it will have effect only when the service is restarted. So you need to have the service set to restart. For E.g. In the below playbook if you run it multiple times the service will restart anyway irrespective of the changes done or not, which is not correct.
+
+---
+- hosts: webservers
+  tasks:
+  - name: Install the apache Package
+    yum: name=httpd state=latest
+  - name: Copy httpd configuration file
+    copy: src=/home/ansible/httpd.final dest=/etc/httpd/conf/httpd.conf
+  - name: Copy index.html file
+   copy: src=/home/ansible/index.html dest=/var/www/html
+   
+   # This service below is executed irrespective of changes done or not to any config files
+
+  - name: Start and Enable httpd service
+  service: name=httpd state=restarted enabled=yes
+  
+So we need to restart service only if the changes are done to configuration files. Handlers provide that feature.
+So the proper flow with handlers would be to have a notify option.
+
+---
+- hosts: webservers
+  become: true
+  tasks:
+  - name: Install httpd package
+    yum: name=httpd state=latest
+  - name: Copy the httpd configuration file
+  copy: src=/home/ansible/httpd.final dest=/etc/httpd/conf/httpd.conf
+  - name: Copy index.html file
+  copy: src=/home/ansible/index.html dest=/var/www/html
+  notify:
+  - restart httpd
+  - name: Start httpd service
+  service: name=httpd state=started enabled=yes
+  handlers:
+  - name: restart httpd
+  service: name=httpd state=restarted
+  
+So for the first time, Apache server will be installed and started. Even if you re-run the playbook without any changes done the httpd service will not restart as it is already started.
+
+If there are any changes to the config files or if the HTML files are changed then once the playbook is run the handler is notified to restart the service. The name in the notify section and handlers should be the same. The handler is written like any other task but is called only if there are changes.
