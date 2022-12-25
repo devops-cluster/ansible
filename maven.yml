@@ -1,0 +1,27 @@
+---
+- name: Install Maven package
+  hosts: all
+  remote_user: ubuntu
+  become: true
+  tasks:
+   - name: Install software-common-properties
+     apt:     ## apt install software-properties-common -y
+      name: software-properties-common
+      state: present
+      update_cache: yes
+      
+   - name: Install openjdk-8-jdk
+     apt:     ## apt install openjdk -y
+      name: openjdk-8-jdk
+      state: present
+      update_cache: yes
+        
+   - name: Download maven package and extract archive
+     unarchive:  ## download maven package and tar -xzf tarfile
+      src: https://dlcdn.apache.org/maven/maven-3/3.8.6/binaries/apache-maven-3.8.6-bin.tar.gz
+      dest: /opt
+      remote_src: yes
+      
+   - name: Update-alternatives
+     shell:  ## update-alternatives
+      cmd: sudo update-alternatives --install /usr/bin/mvn maven /opt/apache-maven-3.3.9/bin/mvn 1001
